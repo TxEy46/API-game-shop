@@ -7,10 +7,11 @@ exports.conn = void 0;
 const mysql_1 = __importDefault(require("mysql"));
 exports.conn = mysql_1.default.createPool({
     connectionLimit: 10,
-    host: "localhost",
-    user: "game_shop",
-    password: "1",
-    database: "game_store",
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: Number(process.env.DB_PORT) || 3306,
 });
 exports.conn.getConnection((err, connection) => {
     if (err) {
