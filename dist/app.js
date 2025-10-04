@@ -8,14 +8,14 @@ const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const cors_1 = __importDefault(require("cors"));
 const express_session_1 = __importDefault(require("express-session"));
-const express_mysql_session_1 = __importDefault(require("express-mysql-session")); // import เป็นชื่ออื่น
+const express_mysql_session_1 = __importDefault(require("express-mysql-session"));
 const db_1 = require("./db");
 const index_1 = require("./api/index");
 const user_1 = require("./api/user");
 const game_1 = require("./api/game");
 const upload_1 = require("./api/upload");
 // ------------------------ MySQL session store ------------------------
-const MySQLStore = express_mysql_session_1.default; // cast เป็น any เพื่อให้ TS ยอม
+const MySQLStore = express_mysql_session_1.default(express_session_1.default);
 const sessionStore = new MySQLStore({}, db_1.conn);
 // ------------------------ Express app ------------------------
 exports.app = (0, express_1.default)();
@@ -25,14 +25,15 @@ exports.app.use((0, cors_1.default)({
 }));
 // ------------------------ Session ------------------------
 exports.app.use((0, express_session_1.default)({
-    name: "session_cookie_name", // ✅ เปลี่ยนจาก key → name
-    secret: "SESSION_SECRET_KEY",
+    name: "session_cookie_name",
+    secret: process.env.SESSION_SECRET || "SESSION_SECRET_KEY",
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 30, // 30 วัน
         httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
     },
 }));
 // ------------------------ Routers ------------------------
